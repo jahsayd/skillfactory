@@ -57,10 +57,9 @@ def repeat_game():
     while True:
         repeat_ = input("Хотите играть ещё раз? Введите y - да, n - нет:").lower()
         if repeat_ == "stop": print("Вы остановили игру, возвращайтесь снова!"), exit()
-        if repeat_ != "y" or repeat_ != "n":
-            print("Вводить нужно y или n")
-            continue
-        break
+        if repeat_ == "y" or repeat_ == "n": break
+        print("Вводить нужно y или n")
+        continue
     return repeat_
 # Игровое поле
 game_area = [
@@ -108,4 +107,12 @@ while True:
             if i == 9:
                 print("Ничья! Это эпичная битва!")
     repeat_ = repeat_game()
-    if repeat_ == "n": break
+    if repeat_ == "n":
+        break
+    else:
+        game_area = [
+            [" ", '1', '2', '3'],
+            ['1', "-", "-", "-"],
+            ['2', "-", "-", "-"],
+            ['3', "-", "-", "-"]
+        ]
