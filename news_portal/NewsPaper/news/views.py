@@ -7,6 +7,7 @@ class PostList(ListView):
     template_name = 'news.html'
     context_object_name = 'news'  # это имя списка, в котором будут лежать все объекты, его надо указать, чтобы
     # обратиться к самому списку объектов через HTML-шаблон
+    queryset = Post.objects.order_by('-post_date')
 
 
 # создаём представление, в котором будут детали конкретного отдельного поста

@@ -1,6 +1,8 @@
 <!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
 {% extends 'flatpages/default.html' %}
 
+{% load custom_filters %}
+
 <!-- Название у нас будет news -->
 {% block title %}
 News
@@ -8,5 +10,11 @@ News
 
 <!-- В контенте на странице мы выводим сам пост, ID которого было передано в адрес -->
 {% block content %}
-<h1>{{ new }}</h1>
+<h1>{{ new.heading|Censor }}</h1>
+<br>
+<body>
+    <div align="left"><b>Дата публикации: {{ new.post_date|date:'d.m.Y'  }}</b></div>
+    <br>
+    <p align="justify" >{{ new.body|Censor }}</p>
+</body>
 {% endblock content %}
