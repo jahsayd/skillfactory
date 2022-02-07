@@ -26,12 +26,18 @@ class Author(models.Model):
         self.aut_rating = p_rate * 3 + c_rate + user_comment_rate
         self.save()
 
+    def __str__(self):
+        return f'{self.author}'
+
 class Category(models.Model):
     category_name = models.CharField(max_length=64, unique=True)
 
+    def __str__(self):
+        return f'{self.category_name}'
+
 
 class Post(models.Model):
-    post_auth = models.ForeignKey(Author, on_delete=models.CASCADE)
+    post_auth = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name='Автор')
     news = 'N'
     article = 'A'
     CONTENT_TYPE = [
@@ -40,12 +46,13 @@ class Post(models.Model):
     ]
     cont_type = models.CharField(max_length=1,
                                  choices=CONTENT_TYPE,
-                                 default=news)
-    post_date = models.DateTimeField(auto_now_add=True)
-    post_category = models.ManyToManyField('Category', through='PostCategory')
-    heading = models.CharField(max_length=128)
-    body = models.TextField()
-    post_rating = models.SmallIntegerField(default=0)
+                                 default=news,
+                                 verbose_name='Тип публикации')
+    post_date = models.DateTimeField(auto_now_add=True, verbose_name='Опубликовано')
+    post_category = models.ManyToManyField('Category', through='PostCategory', verbose_name='Категория')
+    heading = models.CharField(max_length=128, verbose_name='Заголовок')
+    body = models.TextField(verbose_name='Текст')
+    post_rating = models.SmallIntegerField(default=0, verbose_name='Рейтинг')
 
     def like(self):  # Увеличивает рейтинг публикации на 1
         self.post_rating += 1
@@ -57,6 +64,11 @@ class Post(models.Model):
 
     def preview(self):
         return self.body[:123] + '...'
+
+    # добавим абсолютный путь, чтобы после создания нас
+    # перебрасывало на страницу с товаром
+    def get_absolute_url(self):
+        return f'/news/{self.id}'
 
 
 class PostCategory(models.Model):

@@ -13,29 +13,83 @@ News
 <h1>Все новости</h1>
 <h3>Количество публикаций: {{news|length}}</h3>
 <hr>
-    {% if news %} <!-- Если есть товары, то выводим таблицу с ними -->
-        {% for new in news %} <!-- Для каждого поста будет генерироваться новая строчка, т. е. новый
-        html-код. При этом сам цикл работает точно так же, как и в Python.
-        new — переменная цикла, т. е. наш пост, взятый из общего списка -->
-            <h5 align="left" >
-                <b>{{ new.heading|Censor }}</b> <!-- не забываем, что переменные в шаблоне ничем не отличаются от
-                переменных в Python. Здесь также можно получать доступ к полям класса.
-                Например, здесь мы выводим имя, в следующем столбце описание, и т. д.  -->
+{% if is_paginated %}
 
-            </h5>
-            <div align="left">
-                Опубликовано: <b><em>{{ new.post_date|date:'d.m.Y'  }}</em></b>
-
-            </div>
-            <br>
-            <div align="left">
-                {{ new.body|truncatewords:20|Censor }}
-            </div>
-            <br>
-            <hr>
-
-        {% endfor %}
-    {% else %} <!-- Если товаров нет, то говорим, что товаров нет ;) -->
-        <h2>Новостей нет</h2>
+    <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
     {% endif %}
+
+    <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+
+{% endif %}
+<hr>
+{% if news %} <!-- Если есть публикации, то выводим таблицу с ними -->
+    {% for new in news %} <!-- Для каждого поста будет генерироваться новая строчка, т. е. новый
+    html-код. При этом сам цикл работает точно так же, как и в Python.
+    new — переменная цикла, т. е. наш пост, взятый из общего списка -->
+        <div align="left" >
+            <h5><a href="{% url 'new' new.id %}">{{ new.heading|Censor }}</a></h5> <!-- не забываем, что переменные в шаблоне ничем не отличаются от
+            переменных в Python. Здесь также можно получать доступ к полям класса.
+            Например, здесь мы выводим имя, в следующем столбце описание, и т. д.  -->
+            <!-- добавим ссылку на редактирование товара-->
+            <a href="{% url 'post_update' new.id %}"><u>Редактировать</u></a>
+             <!-- добавим ссылку на удаление товара-->
+            <a href="{% url 'post_delete' new.id %}"><u> Удалить </u></a>
+        </div>
+        <div align="left">
+            Опубликовано: <b><em>{{ new.post_date|date:'d.m.Y'  }}</em></b>
+
+        </div>
+        <br>
+        <div align="left">
+            {{ new.body|truncatewords:20|Censor }}
+        </div>
+        <br>
+        <hr>
+
+    {% endfor %}
+{% else %} <!-- Если товаров нет, то говорим, что товаров нет ;) -->
+    <h2>Новостей нет</h2>
+{% endif %}
+
+<!-- Проверяем что поддерживается постраничный вывод -->
+{% if is_paginated %}
+
+    <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+
+{% endif %}
 {% endblock content %}
