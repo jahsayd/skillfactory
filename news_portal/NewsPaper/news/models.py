@@ -29,6 +29,8 @@ class Author(models.Model):
     def __str__(self):
         return f'{self.author}'
 
+
+
 class Category(models.Model):
     category_name = models.CharField(max_length=64, unique=True)
 
@@ -66,7 +68,7 @@ class Post(models.Model):
         return self.body[:123] + '...'
 
     # добавим абсолютный путь, чтобы после создания нас
-    # перебрасывало на страницу с товаром
+    # перебрасывало на страницу с новостью
     def get_absolute_url(self):
         return f'/news/{self.id}'
 

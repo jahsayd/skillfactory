@@ -1,0 +1,33 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block h1 %}Старница автора {{ author.authorUser }}{% endblock h1 %}
+<!-- В контенте на странице мы выводим все посты -->
+{% block content %}
+
+<h1>Информация о вашем профиле {{ profile.first_name }}:</h1>
+<div>Имя пользователя: {{ profile.username }}</div>
+<div>Дата регистрации: {{ profile.date_joined }}</div>
+<div>Последнее посещение: {{ profile.last_login }}</div>
+<div>Имя: {{ profile.first_name }}</div>
+<div>Фамилия: {{ profile.last_name }}</div>
+<div>Электронная почта: {{ profile.email }}</div>
+<div>Пароль: {{ profile.password }}</div>
+
+{% if is_not_author %}
+<div>Является автором: <strong> НЕТ</strong></div>
+{% else %}
+<div>Является автором: <strong>ДА</strong></div>
+{% endif %}
+
+<br>
+{% if is_not_author %}
+<button> <a href="/upgrade/"> Стать автором</a> </button>
+{% endif %}
+
+<!-- добавим ссылку на редактирование профиля-->
+<button><a href="{% url 'profile_edit' %}"><u>Редактировать</u></a></button>
+
+{% endblock content %}
