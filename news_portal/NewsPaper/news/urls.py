@@ -5,7 +5,7 @@ from .views import PostListView, PostDetailView, SearchResultsView, PostAddView,
 urlpatterns = [
         path('', PostListView.as_view(), name='post_list'),
         # т. к. сам по себе это класс, то нам надо представить этот класс в виде view. Для этого вызываем метод as_view
-        path('<int:pk>', PostDetailView.as_view(), name='news'),
+        path('<int:pk>', PostDetailView.as_view(), name='new'),
         # pk — это первичный ключ товара, который будет выводиться у нас в шаблон
         path('search/', SearchResultsView.as_view(), name='search_results'),
         path('add/', PostAddView.as_view(), name='post_add'),

@@ -2,8 +2,7 @@ import django_filters
 from django.forms import DateInput
 from django_filters import FilterSet  # импортируем filterset, чем-то напоминающий знакомые дженерики
 
-
-from .models import Post
+from .models import Post, PostCategory, Category
 
 
 # создаём фильтр
@@ -21,4 +20,13 @@ class PostFilter(FilterSet):
     # по которым будет фильтроваться информация о публикациях
     class Meta:
         model = Post
-        fields = ('post_date', 'heading', 'post_auth')  # поля модели, которые мы будем фильтровать
+        fields = ['post_date', 'heading', 'post_auth']  # поля модели, которые мы будем фильтровать
+
+
+class CathegoryPostFilter(FilterSet):
+    # реализован выбор значений из выпадающего списка
+    post_category = django_filters.ModelChoiceFilter(queryset=Category.objects.all(),
+                                                     empty_label='Все категории')
+    class Meta:
+        model = Post
+        fields = ['post_category']

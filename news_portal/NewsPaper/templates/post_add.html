@@ -7,6 +7,6 @@
 <form method="POST">
     {% csrf_token %}
     {{ form }} <!-- Теперь нам нужна только готовая форма и кнопка -->
-    <input type="submit" value="Опубликовать">
+    <input class="btn btn-secondary" type="submit" value="Опубликовать">
 </form>
 {% endblock content %}

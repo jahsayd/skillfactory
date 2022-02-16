@@ -20,7 +20,8 @@ class Author(models.Model):
 
         # Сумма рейтинга комментариев к постам автора
         post_author = self.post_set.all()
-        user_comment_rate = sum([x['comment_rating'] for x in Comment.objects.filter(post_rel__in=post_author).values()])
+        user_comment_rate = \
+            sum([x['comment_rating'] for x in Comment.objects.filter(post_rel__in=post_author).values()])
 
         # Расчет рейтинга автора
         self.aut_rating = p_rate * 3 + c_rate + user_comment_rate
@@ -30,12 +31,17 @@ class Author(models.Model):
         return f'{self.author}'
 
 
-
 class Category(models.Model):
-    category_name = models.CharField(max_length=64, unique=True)
+    category_name = models.CharField(max_length=64, unique=True, verbose_name='Категория')
+    # subscribers = models.ManyToManyField('User', through='CategoryUser')
 
     def __str__(self):
         return f'{self.category_name}'
+
+
+# class CategoryUser(models.Model):
+#     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Post(models.Model):
@@ -75,7 +81,7 @@ class Post(models.Model):
 
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
 
 
 class Comment(models.Model):

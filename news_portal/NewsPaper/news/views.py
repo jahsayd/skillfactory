@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from .models import Post, Category, User, Author
-from .filters import PostFilter
+from .filters import PostFilter, CathegoryPostFilter
 from .forms import PostForm, ProfileForm
 
 
@@ -21,6 +21,12 @@ class PostListView(ListView):
     # queryset = Post.objects.order_by('-post_date')
     ordering = ['-post_date']  # сортировка по дате
     paginate_by = 10
+
+    #собираем отфильтрованные по категории объекты
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cat_filter'] = CathegoryPostFilter(self.request.GET, queryset=self.get_queryset())
+        return context
 
 
 # создаём представление, в котором будут детали конкретного отдельного поста
