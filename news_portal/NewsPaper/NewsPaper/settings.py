@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
-    'sign', # удалить если не нужно
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
