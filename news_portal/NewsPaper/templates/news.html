@@ -16,7 +16,16 @@ News
 <form method="GET">
     {{ cat_filter.form }}
     <input type="submit" value="Показать">
-    <input type="submit" value="Подписаться">
+    {% if not without_get %}
+        {% if is_not_subscribe %}
+            <button  formaction="add_subscribe/">Подписаться</button>
+        {% else %}
+            <button  formaction="unsubscribe/">Отписаться</button>
+        {% endif %}
+    {% endif %}
+    {% if not subscribe_all %}
+        <button  formaction="add_subscribe/">Подписаться на все</button>
+    {% endif %}
 </form>
 <hr>
 {% if is_paginated %}

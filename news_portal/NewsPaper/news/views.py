@@ -18,16 +18,61 @@ class PostListView(ListView):
     template_name = 'news.html'
     context_object_name = 'news'  # это имя списка, в котором будут лежать все объекты, его надо указать, чтобы
     # обратиться к самому списку объектов через HTML-шаблон
-    # queryset = Post.objects.order_by('-post_date')
     ordering = ['-post_date']  # сортировка по дате
     paginate_by = 10
 
     #собираем отфильтрованные по категории объекты
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs) # общаемся к содержимому контекста представления
+        id = self.request.GET.get('post_category', )  # получаем ИД категории из Get запроса
+        all_cat = Category.objects.all().values_list('pk', flat=True)
+        cur_path = self.request.get_full_path()
+        check = True
+        user_name = self.request.user.username
+
+        # цикл проверки подписан ли текущий юзер на ВСЕ категории
+        for i in all_cat:
+            z = Category.objects.filter(pk=i).values("subscribers__username")
+            if not z.filter(subscribers__username=user_name).exists():
+                print(i)
+                check = False
+                print(check)
+
+        context['subscribe_all'] = check
+        context['without_get'] = cur_path == '/news/'
+
+        if id != "":
+            sub_cat = Category.objects.filter(pk=id).values("subscribers__username")
+            context['is_not_subscribe'] = not sub_cat.filter(subscribers__username=self.request.user.username).exists()
+
         context['cat_filter'] = CathegoryPostFilter(self.request.GET, queryset=self.get_queryset())
         return context
 
+# подписка на категорию/все категории
+@login_required
+def add_subscribe(request):
+    pk = request.GET.get('post_category', )
+    all_cat = Category.objects.all().values_list('pk', flat=True)
+    if pk == "":
+        for cat in all_cat:
+            Category.objects.get(pk=cat).subscribers.add(request.user)
+    else:
+        Category.objects.get(pk=pk).subscribers.add(request.user)
+    return redirect('/news/')
+
+# отписка от категории/всех категорий
+@login_required
+def unsubscribe(request):
+    pk = request.GET.get('post_category', )
+    all_cat = Category.objects.all().values_list('pk', flat=True)
+    if pk == '':
+        for cat in all_cat:
+            print('Пользователь', request.user, 'удален из подписчиков категории:', Category.objects.get(pk=cat))
+            Category.objects.get(pk=cat).subscribers.remove(request.user)
+    else:
+        print('Пользователь', request.user, 'удален из подписчиков категории:', Category.objects.get(pk=pk))
+        Category.objects.get(pk=pk).subscribers.remove(request.user)
+    return redirect('/news/')
 
 # создаём представление, в котором будут детали конкретного отдельного поста
 class PostDetailView(DetailView):
