@@ -32,7 +32,7 @@ class Author(models.Model):
 
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=64, unique=True, verbose_name='Категория')
+    category_name = models.CharField(max_length=64, unique=True)
     subscribers = models.ManyToManyField(User)
 
     def __str__(self):
@@ -52,7 +52,7 @@ class Post(models.Model):
                                  default=news,
                                  verbose_name='Тип публикации')
     post_date = models.DateTimeField(auto_now_add=True, verbose_name='Опубликовано')
-    post_category = models.ManyToManyField('Category', through='PostCategory', verbose_name='Категория')
+    post_category = models.ManyToManyField(Category, through='PostCategory', verbose_name='Категория', related_name='category')
     heading = models.CharField(max_length=128, verbose_name='Заголовок')
     body = models.TextField(verbose_name='Текст')
     post_rating = models.SmallIntegerField(default=0, verbose_name='Рейтинг')
@@ -74,9 +74,10 @@ class Post(models.Model):
         return f'/news/{self.id}'
 
 
+
 class PostCategory(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
 
 class Comment(models.Model):

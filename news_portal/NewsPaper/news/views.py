@@ -2,12 +2,10 @@ from django.http import request
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
 from django.core.paginator import Paginator  # класс позволяющий удобно осуществлять постраничный вывод
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
-
 from .models import Post, Category, User, Author
 from .filters import PostFilter, CathegoryPostFilter
 from .forms import PostForm, ProfileForm
@@ -34,17 +32,14 @@ class PostListView(ListView):
         for i in all_cat:
             z = Category.objects.filter(pk=i).values("subscribers__username")
             if not z.filter(subscribers__username=user_name).exists():
-                print(i)
                 check = False
-                print(check)
-
-        context['subscribe_all'] = check
-        context['without_get'] = cur_path == '/news/'
 
         if id != "":
             sub_cat = Category.objects.filter(pk=id).values("subscribers__username")
             context['is_not_subscribe'] = not sub_cat.filter(subscribers__username=self.request.user.username).exists()
 
+        context['subscribe_all'] = check
+        context['without_get'] = cur_path == '/news/'
         context['cat_filter'] = CathegoryPostFilter(self.request.GET, queryset=self.get_queryset())
         return context
 
@@ -67,10 +62,8 @@ def unsubscribe(request):
     all_cat = Category.objects.all().values_list('pk', flat=True)
     if pk == '':
         for cat in all_cat:
-            print('Пользователь', request.user, 'удален из подписчиков категории:', Category.objects.get(pk=cat))
             Category.objects.get(pk=cat).subscribers.remove(request.user)
     else:
-        print('Пользователь', request.user, 'удален из подписчиков категории:', Category.objects.get(pk=pk))
         Category.objects.get(pk=pk).subscribers.remove(request.user)
     return redirect('/news/')
 
@@ -136,6 +129,43 @@ class PostAddView(PermissionRequiredMixin, CreateView):
     form_class = PostForm
     permission_required = ('news.add_post',)
 
+    # def post(self, request, *args, **kwargs):
+    #     form = PostForm(request.POST)
+    #     cat_pk = request.POST.get('post_category')
+    #     sub_text = request.POST.get('body')
+    #     sub_title = request.POST.get('heading')
+    #     category = Category.objects.get(pk=cat_pk)
+    #     subscribers = category.subscribers.all()
+    #     # получаем адрес хоста и порта (в нашем случае 127.0.0.1:8000), чтоб в дальнейшем указать его в ссылке
+    #     # в письме, чтоб пользователь мог с письма переходить на наш сайт, на конкретную новость
+    #     host = request.META.get('HTTP_HOST')
+    #
+    #     # валидатор - для исключения подмены кода со стороны клиента
+    #     if form.is_valid():
+    #         news = form.save(commit=False)
+    #         news.save()
+    #
+    #     for subscriber in subscribers:
+    #          print('Адреса рассылки:', subscriber.email)
+    #          html_content = render_to_string(
+    #              'mail_send.html', {'user': subscriber, 'text': sub_text[:50], 'post': news, 'host': host})
+    #
+    #          msg = EmailMultiAlternatives(
+    #              # Заголовок письма, тема письма
+    #              subject=f'Здравствуй, {subscriber.username}. Новая статья в твоем любимом разделе!',
+    #              # Наполнение письма
+    #              body=f'{sub_text[:50]}',
+    #              # От кого письмо (должно совпадать с реальным адресом почты)
+    #              from_email='alex.sorokovykh@yandex.ru',
+    #              # Кому отправлять, конкретные адреса рассылки, берем из переменной, либо можно явно прописать
+    #              to=[subscriber.email],
+    #          )
+    #
+    #          msg.attach_alternative(html_content, "text/html")
+    #          print(html_content)
+    #          msg.send()
+    #
+    #     return redirect('/news/')
 
 # дженерик для редактирования объекта
 class PostUpdateView(PermissionRequiredMixin, UpdateView):
