@@ -13,6 +13,8 @@
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     </head>
     <body>
+    {% load cache %}
+    {% cache 100 menu %}
         <!-- Responsive navbar-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
            <div class="container">
@@ -74,5 +76,6 @@
                </div>
            </div>
         </div>
+    {% endcache %}
     </body>
 </html>

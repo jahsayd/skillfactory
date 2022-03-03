@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Post, Category, User, Author
 from .filters import PostFilter, CathegoryPostFilter
 from .forms import PostForm, ProfileForm
-
+from django.core.cache import cache # импортируем кэш
 
 class PostListView(ListView):
     model = Post
@@ -72,6 +72,18 @@ class PostDetailView(DetailView):
     template_name = 'new.html'
     context_object_name = 'new'
     queryset = Post.objects.all()
+
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта
+        obj = cache.get(f'new-{self.kwargs["pk"]}',
+                        None)  # кэш очень похож на словарь, и метод get действует также.
+        # Он забирает значение по ключу, если его нет, то забирает None.
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(*args, **kwargs)
+            cache.set(f'new-{self.kwargs["pk"]}', obj)
+
+        return obj
 
 
 # представление данных пользователя
