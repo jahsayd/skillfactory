@@ -178,3 +178,9 @@ APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 # время побольше сильно бьёт по производительности сервера
 
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+CELERY_BROKER_URL = 'redis://:1Y60MnaEsdu3OkqVw06ljsjIBcNHaHQI@redis-19358.c238.us-central1-2.gce.cloud.redislabs.com:19358/0'
+CELERY_RESULT_BACKEND = 'redis://:1Y60MnaEsdu3OkqVw06ljsjIBcNHaHQI@redis-19358.c238.us-central1-2.gce.cloud.redislabs.com:19358/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

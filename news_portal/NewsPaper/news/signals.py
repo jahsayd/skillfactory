@@ -12,12 +12,12 @@ from .models import Category, PostCategory
 
 @receiver(m2m_changed, sender=PostCategory)
 def send_sub_mail(sender, instance, **kwargs):
-    # получаю текущее действие, их 2 pre_add и post_add, на post_add нет множества id категорий
+    # получаю текущее действие, из 2 pre_add и post_add, на post_add нет множества id категорий
     action = kwargs.pop('action', None)
 
     # получаю множество связи M2M поста с категорией (если больше 1й категории)
     pk_set = kwargs.pop('pk_set', None)
-    # если действие до добавления связи (в этот момент есть id)
+    # если действие до добавления связи M2M (в этот момент есть id)
     if action == "pre_add":
         for i in pk_set:  # цикл по количеству категорий у публикации
             sub_text = instance.body
