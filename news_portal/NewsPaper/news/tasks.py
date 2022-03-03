@@ -21,3 +21,18 @@ def send_mail_for_sub_once(sub_uname, sub_email, html_content):
     msg.send()
     print('Письмо отправлено')
 
+# отправка еженедельной рассылки
+@shared_task
+def send_mail_for_sub_weekly(sub_uname, sub_email, html_content):
+    print('Отправка письма')
+    msg = EmailMultiAlternatives(
+        subject=f'Здравствуй, {sub_uname}, новые статьи за прошлую неделю в вашем разделе!',
+        from_email='alex.sorokovykh@yandex.ru',
+        to=[sub_email]
+    )
+    msg.attach_alternative(html_content, 'text/html')
+    # содержимое письма для проверки
+    print(html_content)
+
+    # Отправка письма
+    # msg.send()

@@ -7,6 +7,8 @@ from celery import Celery
 # в свою очередь в файле settings будут лежать все настройки celery.
 # Соответственно при указании данной директивы нам не нужно будет при вызове каждого task(функции) прописывать
 # эти настройки.
+from celery.schedules import crontab
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'NewsPaper.settings')
 
 # Создаем объект(экземпляр класса) celery и даем ему имя
@@ -22,3 +24,11 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # task-и т.е. какие-либо задания. При указании этой настройки
 # celery будет автоматом искать такие файлы и подцеплять к себе.
 app.autodiscover_tasks()
+
+# для еженедельной рассылки настраиваем расписание запусков таска
+app.conf.beat_schedule = {
+    'send_mail_every_monday_8am': {
+        'task': 'news.tasks.send_mail_for_sub_weekly',
+        'schedule': crontab(hour=8, minute=0, day_of_week='monday'),
+    },
+}
