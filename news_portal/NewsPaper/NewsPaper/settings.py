@@ -192,3 +192,120 @@ CACHES = {
         # Не забываем создать папку cache_files внутри папки с manage.py!
     }
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    # Средства форматирования
+    'formatters': {
+        # Для DEBUG -время, уровень сообщения, сообщение
+        'debug_console': {
+            'format': '%(asctime)s %(levelname)s %(message)s',
+        },
+        # Для WARNING -время, уровень сообщения, путь к источнику, сообщение
+        'warning_console': {
+            'format': '%(asctime)s %(levelname)s %(pathname)s %(message)s'
+        },
+        # Для ERROR и CRITICAL - дополнительно стэк ошибки
+        'error_critical': {
+            'format': '%(asctime)s %(levelname)s %(message)s %(pathname)s %(exc_info)s'
+        },
+
+        'general_security_log': {
+            'format': '%(asctime)s %(levelname)s %(module)s %(message)s'
+        },
+
+        'mail_log': {
+            'format': '%(asctime)s %(levelname)s %(pathname)s %(message)s'
+        }
+    },
+    # Фильтры
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    # Обработчики
+    'handlers': {
+        # DEBUG в консоль
+        'console_debug': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'debug_console'
+        },
+        # WARNING в консоль
+        'console_warning': {
+            'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'warning_console'
+        },
+        # INFO в general.log
+        'file_general': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': 'general.log',
+            'formatter': 'general_security_log'
+        },
+        # Сообщения связанные с безопасностью в security.log
+        'file_security': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'general_security_log'
+        },
+        # Сообщения уровня ERROR в errors.log
+        'file_errors': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'error_critical'
+        },
+        # Сообщения уровня CRITICAL в errors.log
+        'file_critical': {
+            'level': 'CRITICAL',
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'error_critical'
+        },
+        # На почту должны отправляться сообщения уровней ERROR и выше
+        'mail_admin': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'mail_log'
+        }
+    },
+    # Регистраторы
+    'loggers': {
+        'django': {
+            'handlers': ['console_debug', 'console_warning', 'file_general'],
+            'propagate': True,
+        },
+        'django.template': {
+            'handlers': ['file_errors', 'file_critical'],
+            'propagate': True,
+        },
+        'django.db_backends': {
+            'handlers': ['file_errors', 'file_critical'],
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['file_security'],
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file_errors', 'file_critical', 'mail_admin'],
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['file_errors', 'file_critical', 'mail_admin'],
+            'propagate': True,
+        }
+    }
+}
