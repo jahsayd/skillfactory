@@ -11,6 +11,7 @@ from .filters import PostFilter, CathegoryPostFilter
 from .forms import PostForm, ProfileForm
 from django.core.cache import cache # импортируем кэш
 
+
 class PostListView(ListView):
     model = Post
     template_name = 'news.html'
